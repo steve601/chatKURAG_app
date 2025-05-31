@@ -1,10 +1,11 @@
 import gradio as gr
+import os
 from langchain.llms import HuggingFaceHub  # for accessing huggingface models
 from langchain_huggingface import HuggingFaceEmbeddings # embeding the documents in the vectorstore
 from langchain_huggingface import ChatHuggingFace # chat model
 from langchain.prompts import ChatPromptTemplate
 from langchain_huggingface import HuggingFaceEndpoint
-from langchain_community.document_loaders import PyPDFLoade
+from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import Chroma
 from langchain.retrievers import BM25Retriever
@@ -17,7 +18,7 @@ from langchain_core.messages import HumanMessage,AIMessage
 from langchain.tools.retriever import create_retriever_tool
 
 def build_rag_chain():
-    pdfloader = PyPDFLoader('/kaggle/input/kenyattauni/kuDoc.pdf')
+    pdfloader = PyPDFLoader('kuDoc.pdf')
     docs = pdfloader.load()
 
     splitter = RecursiveCharacterTextSplitter(chunk_size=1000,chunk_overlap=0)
