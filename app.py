@@ -17,6 +17,7 @@ from langchain.chains import create_retrieval_chain
 from langchain_core.messages import HumanMessage,AIMessage
 from langchain.tools.retriever import create_retriever_tool
 
+hf_tkn = os.getenv("hf_tkn")
 def build_rag_chain():
     pdfloader = PyPDFLoader('kuDoc.pdf')
     docs = pdfloader.load()
