@@ -1,4 +1,5 @@
-langchain langchain_community 
+langchain 
+langchain_community 
 huggingface_hub
 faiss-cpu 
 pypdf 
