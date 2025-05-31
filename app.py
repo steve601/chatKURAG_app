@@ -17,4 +17,4 @@ with gr.Blocks(theme="soft-dark") as demo:
         elem_id="footer"
     )
 if __name__ == "__main__":
-    demo.launch()
+    demo.launch(share = True)
