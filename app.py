@@ -6,6 +6,7 @@ demo = gr.ChatInterface(
     fn = None,
     chatbot = gr.Chatbot(label = "ChatKU"),
     title = 'Any Queries about Kenyatta University?',
+    additional_inputs = [gr.Markdown('ChatKU can make mistakes,check important info.')]
     autoscroll = True,
     theme = 'soft-dark'
 )
