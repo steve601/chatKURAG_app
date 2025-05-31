@@ -1,13 +1,14 @@
 import gradio as gr
 from huggingface_hub import InferenceClient
 
+gr.Markdown("<center>Any Queries about Kenyatta University</center>")
 demo = gr.ChatInterface(
-    respond,
-    additional_inputs=[
-        gr.Textbox(value="You are a friendly Chatbot.", label="System message"),
-    ],
-    description = 'ChatKU',
-    theme = 'Dark'
+    fn = None,
+    textbox = gr.Textbox(placeholder = "Message me..."),
+    container = False,
+    title = 'ChatKU',
+    autoscroll = True
+    theme = 'soft-dark'
 )
 
 
