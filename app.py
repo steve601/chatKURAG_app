@@ -1,5 +1,6 @@
 import gradio as gr
 import os
+import time
 from langchain.llms import HuggingFaceHub  # for accessing huggingface models
 from langchain_huggingface import HuggingFaceEmbeddings # embeding the documents in the vectorstore
 from langchain_huggingface import ChatHuggingFace # chat model
@@ -16,6 +17,7 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain.chains import create_retrieval_chain
 from langchain_core.messages import HumanMessage,AIMessage
 from langchain.tools.retriever import create_retriever_tool
+from langchain_groq import ChatGroq
 
 hf_tkn = os.getenv("hf_tkn")
 def build_rag_chain():
@@ -36,16 +38,15 @@ def build_rag_chain():
         weights=[0.5, 0.5]
     )
 
-    llm = HuggingFaceEndpoint(
-        repo_id="HuggingFaceH4/zephyr-7b-beta",
-        task="text-generation",
-        max_new_tokens=512,
-        do_sample=False,
-        repetition_penalty=1.03,
-        huggingfacehub_api_token=hf_tkn
+    llm = ChatGroq(
+        model="llama-3.1-8b-instant",
+        temperature=0,
+        max_tokens=None,
+        timeout=None,
+        max_retries=2,
     )
 
-    chat_model = ChatHuggingFace(llm=llm)
+    chat_model = llm
 
     memory_system_prompt = (
         "You are ChatKU, an AI assistant that helps users learn more about Kenyatta University. "
@@ -68,6 +69,7 @@ def build_rag_chain():
         "Remember the user's name when they introduce it (e.g., 'Hello, am Steve') and"
         "use it in future responses when the user asks about their name"
         "Use only the information provided in the context below. "
+        "think like an agent before answering the question and give the correct answer"
         "Do not make up information or add external knowledge. "
         "If the answer cannot be found in the context, say so clearly. "
         "Keep your answers concise, natural, and friendly. "
@@ -107,11 +109,15 @@ def chatku_fn(message, history):
     chat_history.append(HumanMessage(content=message))
     chat_history.append(AIMessage(content=answer))
 
-    return answer
+    simulated = ""
+    for char in answer:
+        simulated += char
+        yield simulated
+        time.sleep(0.02)
 
-with gr.Blocks(theme="soft-dark") as demo:
+with gr.Blocks(fill_height = True) as demo:
     gr.Markdown(
-        "<h2 style='text-align: center;'>Any Queries about Kenyatta University</h2>"
+        "<h2 style='text-align: center;'>Any Queries about Kenyatta University?</h2>"
     )
 
     gr.ChatInterface(
