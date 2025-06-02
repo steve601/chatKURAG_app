@@ -6,4 +6,5 @@ pypdf
 langchain_huggingface
 chromadb 
 langchain_core
+langchain-groq
 rank_bm25
