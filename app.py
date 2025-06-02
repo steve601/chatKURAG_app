@@ -109,12 +109,9 @@ def chatku_fn(message, history):
     chat_history.append(HumanMessage(content=message))
     chat_history.append(AIMessage(content=answer))
 
-    simulated = ""
     for char in answer:
-        simulated += char
-        yield simulated
-        time.sleep(0.02)
-
+        yield char
+        time.sleep(0.04)
 with gr.Blocks(fill_height = True) as demo:
     gr.Markdown(
         "<h2 style='text-align: center;'>Any Queries about Kenyatta University?</h2>"
@@ -123,7 +120,8 @@ with gr.Blocks(fill_height = True) as demo:
     gr.ChatInterface(
         fn=chatku_fn,
         chatbot=gr.Chatbot(label="💬 ChatKU"),
-        autoscroll=True
+        autoscroll=True,
+        stream = True
     )
 
     gr.Markdown(
