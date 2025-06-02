@@ -19,7 +19,7 @@ from langchain_core.messages import HumanMessage,AIMessage
 from langchain.tools.retriever import create_retriever_tool
 from langchain_groq import ChatGroq
 
-hf_tkn = os.getenv("hf_tkn")
+hf_tkn = os.getenv("gr_tkn")
 def build_rag_chain():
     pdfloader = PyPDFLoader('kuDoc.pdf')
     docs = pdfloader.load()
