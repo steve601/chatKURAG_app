@@ -110,6 +110,8 @@ def chatku_fn(message, history):
     chat_history.append(HumanMessage(content=message))
     chat_history.append(AIMessage(content=answer))
 
+    return answer
+    
 with gr.Blocks(fill_height = True) as demo:
     gr.Markdown(
         "<h2 style='text-align: center;'>Any Queries about Kenyatta University?</h2>"
