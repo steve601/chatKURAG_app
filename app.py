@@ -20,6 +20,7 @@ from langchain.tools.retriever import create_retriever_tool
 from langchain_groq import ChatGroq
 
 token = os.getenv('gr_tkn')
+port = int(os.environ.get("PORT", 7860))
 os.environ["GROQ_API_KEY"] = token
 def build_rag_chain():
     pdfloader = PyPDFLoader('kuDoc.pdf')
@@ -128,4 +129,4 @@ with gr.Blocks(fill_height = True) as demo:
         elem_id="footer"
     )
 if __name__ == "__main__":
-    demo.launch(share = True)
+    demo.launch(server_name="0.0.0.0", server_port=port)
