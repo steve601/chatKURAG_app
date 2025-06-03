@@ -120,8 +120,7 @@ with gr.Blocks(fill_height = True) as demo:
     gr.ChatInterface(
         fn=chatku_fn,
         chatbot=gr.Chatbot(label="💬 ChatKU"),
-        autoscroll=True,
-        stream = True
+        autoscroll=True
     )
 
     gr.Markdown(
