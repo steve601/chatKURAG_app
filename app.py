@@ -99,31 +99,16 @@ def build_rag_chain():
 rag_chain = build_rag_chain()
 chat_history = []
 
-def generate_response(chain, message, chat_history):
-    response = chain.invoke({
+def chatku_fn(message, history):
+    global chat_history
+    response = rag_chain.invoke({
         "input": message,
         "chat_history": chat_history
     })
     answer = response["answer"]
-    
-    for char in answer:
-        yield char
-        time.sleep(0.05)
 
-    # Return the full answer after streaming
-    return answer
-
-
-def chatku_fn(message, history):
-    response = ""
-    
-    for char in generate_response(rag_chain, message, history):
-        response += char
-        yield char
-
-    history.append(HumanMessage(content=message))
-    history.append(AIMessage(content=response))
-
+    chat_history.append(HumanMessage(content=message))
+    chat_history.append(AIMessage(content=answer))
 
 with gr.Blocks(fill_height = True) as demo:
     gr.Markdown(
