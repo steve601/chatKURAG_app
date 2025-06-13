@@ -40,11 +40,12 @@ def build_rag_chain():
     )
 
     llm = ChatGroq(
-        model="llama-3.1-8b-instant",
-        temperature=0,
-        max_tokens=None,
-        timeout=None,
-        max_retries=2,
+        model = "llama-3.1-8b-instant",
+        temperature = 0,
+        max_tokens = None,
+        timeout = None,
+        max_retries = 2,
+        streaming = True
     )
 
     chat_model = llm
@@ -56,7 +57,8 @@ def build_rag_chain():
         "Given the chat history and the latest user message, rewrite the user’s message as a clear, self-contained question that incorporates all relevant context. "
         "Do not invent new information. "
         "If the user introduces themselves (e.g., 'Hello, I am Steve' or 'My name is Joy'), remember their name for the rest of the conversation. "
-        "If the user later asks 'What is my name?' or similar, respond using the name they previously provided. "
+        "If the user later asks 'What is my name?' or similar, respond using the name they previously provided."
+        "And don't keep saying their name while answering questions,you may only say it at the beginning and end of conversation"
         )
     memory_prompt = ChatPromptTemplate.from_messages([
         ('system',memory_system_prompt),
@@ -67,8 +69,8 @@ def build_rag_chain():
     system_prompt = (
         "You are ChatKU, an AI assistant that helps users learn more about Kenyatta University."
         "Greet the user by saying: 'Hello my name is ChatKU, I can help you to get to know more about Kenyatta University, so how can I help you dear?' "
-        "Remember the user's name when they introduce it (e.g., 'Hello, am Steve') and"
-        "use it in future responses when the user asks about their name"
+        "Remember the user's name when they introduce it (e.g., 'Hello, am Steve')"
+        "And don't keep saying their name while answering questions,you may only say it at the beginning and end of conversation"
         "Use only the information provided in the context below. "
         "think like an agent before answering the question and give the correct answer"
         "Do not make up information or add external knowledge. "
@@ -76,7 +78,9 @@ def build_rag_chain():
         "Keep your answers concise, natural, and friendly. "
         "Feel free to address the user by name if mentioned in the chat history. "
         "Avoid repeating long context word-for-word. "
-        "Never start your answer with phrases like 'Based on the provided context'. "
+        "Never start your answer with phrases like 'Based on the provided context'...or 'According to the information i have...' "
+        "and don't include them anywhere in your answer"
+        "You are free to use emojis"
         "Consider bolded or stylized text in the context as important keywords.\n\n"
         "Context:\n{context}\n\n"
     )
@@ -100,18 +104,27 @@ rag_chain = build_rag_chain()
 chat_history = []
 
 def chatku_fn(message, history):
-    global chat_history
-    response = rag_chain.invoke({
+    # convert history to LangChain format so that the application can be unique across different devices
+    chat_history = []
+    for human, ai in history:
+        chat_history.append(HumanMessage(content=human))
+        chat_history.append(AIMessage(content=ai))
+
+    # call the RAG chain with streaming
+    response_stream = rag_chain.stream({
         "input": message,
         "chat_history": chat_history
     })
-    answer = response["answer"]
 
-    chat_history.append(HumanMessage(content=message))
-    chat_history.append(AIMessage(content=answer))
+    partial_answer = ""
+    for chunk in response_stream:
+        delta = chunk.get("answer", "")
+        partial_answer += delta
 
-    return answer
-    
+        time.sleep(0.06) # delay the streaming of tokens
+        yield partial_answer  # stream output piece-by-piece
+
+  
 with gr.Blocks(fill_height = True) as demo:
     gr.Markdown(
         "<h2 style='text-align: center;'>Any Queries about Kenyatta University?</h2>"
@@ -124,7 +137,7 @@ with gr.Blocks(fill_height = True) as demo:
     )
 
     gr.Markdown(
-        "⚠️ *ChatKU can make mistakes, check important info.*",
+        "⚠️ **ChatKU can make mistakes, check important info.**",
         elem_id="footer"
     )
 if __name__ == "__main__":
